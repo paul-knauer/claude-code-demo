@@ -4,6 +4,25 @@ The difference between a mediocre result and a great one is almost always the qu
 
 ---
 
+## Demo Codebase — Quick Reference
+
+The prompt examples throughout this guide target the sample API in `src/`. Use these as your
+ground truth when writing prompts against this repository.
+
+| Symbol | Kind | Location | Purpose |
+|--------|------|----------|---------|
+| `Item` | interface | `src/api/index.ts` | Shape of a single collection item: `{ id, name, createdAt }` |
+| `CreateItemRequest` | interface | `src/api/index.ts` | Request body for creating an item: `{ name: string }` |
+| `ApiResponse<T>` | interface | `src/api/index.ts` | Standard response envelope: `{ success, data?, error? }` |
+| `handleHealthCheck()` | function | `src/api/index.ts` | GET /health — returns `ApiResponse<{ status: string }>` |
+| `handleGetItems()` | function | `src/api/index.ts` | GET /items — returns `ApiResponse<Item[]>` |
+| `handleCreateItem(body)` | function | `src/api/index.ts` | POST /items — validates and creates an item; `body` may be `null` |
+| `clearItems()` | function | `src/api/index.ts` | Resets the in-memory store; call in `beforeEach` for test isolation |
+| `ValidationError` | class | `src/errors/index.ts` | Typed error with `message` and optional `field` property |
+| `logger` | object | `src/utils/logger.ts` | Structured JSON logger: `logger.debug/info/warn/error(msg, meta?)` |
+
+---
+
 ## The Core Principle: Give Claude the Context a Senior Developer Would Want
 
 Before starting any task, a good developer would want to know:
@@ -41,15 +60,17 @@ Claude will output its full approach before touching any code. **Review the plan
 
 ```
 # ❌ Weak
-"Fix the login bug"
+"Fix the item creation bug"
 
 # ✅ Strong
-"The POST /api/auth/login endpoint returns a 500 error when the user's email 
-contains a + character (e.g. user+tag@email.com). This is causing support tickets.
+"The handleCreateItem handler in src/api/index.ts returns { success: false }
+when the request body is null, but it does not return a typed ValidationError
+for the 'body' field — it returns a plain error string instead.
 
-Fix this in src/auth/loginHandler.ts without changing the API contract.
-The existing login tests must still pass, and add a new test specifically 
-for emails with + characters."
+Fix this so that a missing body always returns a ValidationError with
+field: 'body', without changing the ApiResponse<Item> return type.
+The existing tests in src/api/index.test.ts must still pass, and add a new
+test specifically for a null body input."
 ```
 
 ### Adding Features

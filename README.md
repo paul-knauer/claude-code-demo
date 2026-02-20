@@ -337,7 +337,7 @@ scripts/ralph/
 
 ### Safety Controls
 
-- `--max-iterations` — Hard limit prevents runaway loops
+- Second positional argument (e.g. `20`) — Hard limit on iterations; the script reads it as `MAX_ITERATIONS` and exits the loop when reached
 - `DONE` marker — Claude signals completion to break early
 - `progress.txt` — Full audit trail of every iteration
 - Git history — Every iteration commits, giving full rollback capability
@@ -381,8 +381,10 @@ claude-code-showcase/
 │   ├── prompting/intent-guide.md    # Prompting best practices
 │   ├── mcp/setup-guide.md           # MCP configuration guide
 │   └── ralph/philosophy.md          # Ralph loop deep dive
-└── src/                             # Sample project code
-    └── api/                         # Demo API for testing features
+└── src/                             # Sample project code (demo target)
+    ├── api/                         # Route handlers + typed request/response interfaces
+    ├── errors/                      # Typed error classes (ValidationError)
+    └── utils/                       # Shared utilities (logger)
 ```
 
 ---
