@@ -47,7 +47,10 @@ echo "[post-test] Global line coverage: ${COVERAGE}%" >&2
 
 # Warn if coverage has dropped below the 80% threshold
 THRESHOLD=80
-BELOW=$(python3 -c "print('yes' if float('${COVERAGE}') < ${THRESHOLD} else 'no')" 2>/dev/null || echo "unknown")
+# Pass $COVERAGE as an argument (sys.argv[1]) rather than interpolating it into
+# the code string. This prevents a crafted coverage value from being executed as
+# Python code (shell-injection-into-python vulnerability).
+BELOW=$(python3 -c "import sys; print('yes' if float(sys.argv[1]) < ${THRESHOLD} else 'no')" "$COVERAGE" 2>/dev/null || echo "unknown")
 
 if [[ "$BELOW" == "yes" ]]; then
   echo "" >&2
