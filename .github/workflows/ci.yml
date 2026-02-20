@@ -1,0 +1,52 @@
+# =============================================================================
+# CI Workflow — Claude Code Demo Project
+# =============================================================================
+# Runs on every push to main and on every pull request targeting main.
+# Steps mirror what a developer should run locally before pushing:
+#   typecheck → lint → test (with coverage) → build
+# =============================================================================
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    name: Typecheck, Lint, Test, Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Cache node_modules based on package-lock.json to speed up future runs
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: ".nvmrc"
+          cache: "npm"
+
+      # `npm ci` installs exact versions from package-lock.json — preferred over
+      # `npm install` in CI because it is deterministic and fails on drift
+      - name: Install dependencies
+        run: npm ci
+
+      # Type-check without emitting files — catches type errors early
+      - name: Typecheck
+        run: npm run typecheck
+
+      # Enforce code style — fails if ESLint or Prettier finds issues
+      - name: Lint
+        run: npm run lint
+
+      # Run tests with coverage — fails if coverage drops below 80% (see package.json)
+      - name: Test
+        run: npm test
+
+      # Compile TypeScript to JavaScript — verifies a clean build end-to-end
+      - name: Build
+        run: npm run build

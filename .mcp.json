@@ -1,0 +1,18 @@
+{
+  "mcpServers": {
+    "filesystem": {
+      "command": "npx",
+      "args": ["-y", "@modelcontextprotocol/server-filesystem", "."],
+      "description": "Provides filesystem access to the project directory"
+    },
+    "atlassian": {
+      "command": "npx",
+      "args": ["-y", "@anthropic-ai/mcp-server-atlassian"],
+      "env": {
+        "ATLASSIAN_API_TOKEN": "${ATLASSIAN_API_TOKEN}",
+        "ATLASSIAN_BASE_URL": "${ATLASSIAN_BASE_URL}"
+      },
+      "description": "Provides access to Jira and Confluence"
+    }
+  }
+}
